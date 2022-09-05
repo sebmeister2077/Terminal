@@ -1,0 +1,99 @@
+@font-face {
+    font-family: Noto;
+    src: url("./assets/fonts/NotoSansDisplay_SemiCondensed-Regular.ttf");
+}
+
+* {
+    margin: 0px;
+    box-sizing: border-box;
+    /* caret-color: transparent; */
+    font-family: Noto;
+    font-size: 1.15rem;
+}
+
+*::selection {
+    background-color: #fff;
+    color: rgb(35, 32, 32);
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    overflow: clip auto;
+    background-color: hsl(0, 0%, 5%);
+    color: hsla(0, 0%, 80%, 0.9);
+}
+
+body::-webkit-scrollbar {
+    width: 0.9em;
+    background-color: rgb(23, 23, 23);
+}
+
+body::-webkit-scrollbar-button:hover {
+    background-color: rgb(55, 55, 55);
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgb(122, 122, 122);
+    outline: 1px solid rgb(23, 23, 23);
+}
+
+::-webkit-scrollbar-button:single-button {
+    background-color: rgb(23, 23, 23);
+    display: block;
+    border-style: solid;
+    height: 13px;
+    margin-bottom: 10px;
+    width: 16px;
+}
+
+/*  Up */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+    border-width: 0 8px 8px 8px;
+    border-color: transparent transparent rgb(103, 103, 103) transparent;
+}
+
+/* Down */
+::-webkit-scrollbar-button:single-button:vertical:increment {
+    border-width: 8px 8px 0 8px;
+    border-color: rgb(103, 103, 103) transparent transparent transparent;
+}
+
+terminal-line {
+    display: block;
+    height: 2000px;
+    width: 100%;
+}
+
+terminal-line-path {
+    float: left;
+    margin-inline: 2px;
+}
+
+terminal-line-path::after {
+    content: '>';
+}
+
+.terminal-input {
+    width: 100%;
+    -webkit-user-modify: read-write;
+}
+
+.writable.terminal-input {
+    min-height: 500vh;
+}
+
+.text-cursor {
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+    text-decoration-thickness: 6px;
+}
+
+.terminal-input:focus-visible {
+    outline: none;
+}
+
+/* .terminal-input::after {
+    content: '';
+    animation: textCursorAnimation 1.7s infinite;
+} */
