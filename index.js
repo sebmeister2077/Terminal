@@ -1,6 +1,6 @@
-import { createTerminalLine } from "./scripts/components.js";
-import { addListeners } from "./scripts/listeners.js";
+import { createTerminalLine } from './scripts/components.js'
+import { addGlobalListeners } from './scripts/listeners.js'
 
-addListeners();
+addGlobalListeners()
 
-document.body.append(createTerminalLine("C:\\Seba", "some text"));
+createTerminalLine('C:\\Seba', 'some initial text')

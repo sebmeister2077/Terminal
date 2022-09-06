@@ -17,6 +17,7 @@
 }
 
 body {
+    position: relative;
     height: 100vh;
     width: 100vw;
     overflow: clip auto;
@@ -60,9 +61,16 @@ body::-webkit-scrollbar-thumb {
 }
 
 terminal-line {
+    padding-top: 10px;
     display: block;
     height: 2000px;
     width: 100%;
+    white-space: pre;
+}
+
+terminal-line[readonly] {
+    height: min-content;
+    -webkit-user-modify: read-only;
 }
 
 terminal-line-path {
@@ -75,15 +83,19 @@ terminal-line-path::after {
 }
 
 .terminal-input {
+    min-height: 500vh;
     width: 100%;
     -webkit-user-modify: read-write;
 }
 
-.writable.terminal-input {
-    min-height: 500vh;
+terminal-line[readonly] .terminal-input {
+    min-height: initial;
+    -webkit-user-modify: read-only;
 }
 
 .text-cursor {
+    position: absolute;
+    width: 1ch;
     text-decoration: underline;
     text-decoration-skip-ink: none;
     text-decoration-thickness: 6px;
@@ -92,8 +104,3 @@ terminal-line-path::after {
 .terminal-input:focus-visible {
     outline: none;
 }
-
-/* .terminal-input::after {
-    content: '';
-    animation: textCursorAnimation 1.7s infinite;
-} */
