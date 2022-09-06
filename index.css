@@ -17,10 +17,12 @@
 }
 
 body {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
     height: 100vh;
-    width: 100vw;
-    overflow: clip auto;
+    width: 100%;
+    /* overflow: clip auto; */
     background-color: hsl(0, 0%, 5%);
     color: hsla(0, 0%, 80%, 0.9);
 }
@@ -61,7 +63,7 @@ body::-webkit-scrollbar-thumb {
 }
 
 terminal-line {
-    padding-top: 10px;
+    position: relative;
     display: block;
     height: 2000px;
     width: 100%;
@@ -70,36 +72,33 @@ terminal-line {
 
 terminal-line[readonly] {
     height: min-content;
-    -webkit-user-modify: read-only;
 }
 
-terminal-line-path {
-    float: left;
-    margin-inline: 2px;
-}
-
-terminal-line-path::after {
-    content: '>';
+.line-path {
+    position: absolute;
+    top: 2px;
+    left: 0px;
 }
 
 .terminal-input {
     min-height: 500vh;
     width: 100%;
-    -webkit-user-modify: read-write;
+    background-color: inherit;
+    color: inherit;
+    border: none;
 }
 
 terminal-line[readonly] .terminal-input {
     min-height: initial;
-    -webkit-user-modify: read-only;
 }
 
-.text-cursor {
+/* .text-cursor {
     position: absolute;
     width: 1ch;
     text-decoration: underline;
     text-decoration-skip-ink: none;
     text-decoration-thickness: 6px;
-}
+} */
 
 .terminal-input:focus-visible {
     outline: none;
