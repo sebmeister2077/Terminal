@@ -3,4 +3,4 @@ import { addGlobalListeners } from './scripts/listeners.js'
 
 addGlobalListeners()
 
-createTerminalLine('C:\\Seba', 'some initial text')
+createTerminalLine('C:\\Seba', 'text')

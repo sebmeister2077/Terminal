@@ -18,6 +18,7 @@ function createTerminalLine(pathText = 'C:\\Users', text = 'Some text') {
         .fill(' ')
         .join('')
     input.textContent = `${neededSpaces}${text}`
+    input.dataset['spaces'] = newPathText.length * 2
     main.append(path)
     main.append(input)
     main.append(cursor)
@@ -26,7 +27,8 @@ function createTerminalLine(pathText = 'C:\\Users', text = 'Some text') {
     document.body.append(main)
 
     input.focus()
-
+    input.setSelectionRange(input.textLength, input.textLength)
+    input.setSelectionRange(input.textContent.length, input.textContent.length)
     addListenersForInput(input)
 }
 
