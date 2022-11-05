@@ -1,1 +1,1 @@
-You can get the deployed app url [https://seb-terminal.web.app](here)
+You can get the deployed app url [here](https://seb-terminal.web.app)
