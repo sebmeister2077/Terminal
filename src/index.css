@@ -1,0 +1,58 @@
+@font-face {
+  font-family: Noto;
+  src: url("./shared/assets/fonts/NotoSansDisplay_SemiCondensed-Regular.ttf");
+}
+
+* {
+  box-sizing: border-box;
+  font-family: Noto;
+  margin: 0px;
+}
+
+*::selection {
+  background-color: #fff;
+  color: rgb(35, 32, 32);
+}
+
+
+body {
+  background-color: hsl(0, 0%, 5%);
+  color: hsla(0, 0%, 80%, 0.9);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::-webkit-scrollbar {
+  width: 0.9em;
+  background-color: rgb(23, 23, 23);
+}
+
+body::-webkit-scrollbar-button:hover {
+  background-color: rgb(55, 55, 55);
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: rgb(122, 122, 122);
+  outline: 1px solid rgb(23, 23, 23);
+}
+
+::-webkit-scrollbar-button:single-button {
+  background-color: rgb(23, 23, 23);
+  display: block;
+  border-style: solid;
+  height: 13px;
+  margin-bottom: 10px;
+  width: 16px;
+}
+
+/*  Up */
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent rgb(103, 103, 103) transparent;
+}
+
+/* Down */
+::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-width: 8px 8px 0 8px;
+  border-color: rgb(103, 103, 103) transparent transparent transparent;
+}
