@@ -56,3 +56,14 @@ body::-webkit-scrollbar-thumb {
   border-width: 8px 8px 0 8px;
   border-color: rgb(103, 103, 103) transparent transparent transparent;
 }
+
+#root {
+  display: flex;
+  width: 100vw
+}
+
+#root iframe,
+#root marquee {
+  user-select: none;
+  width: 50%;
+}
