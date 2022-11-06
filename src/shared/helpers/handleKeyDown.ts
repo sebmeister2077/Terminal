@@ -1,5 +1,5 @@
 import { Dispatch, RefObject, SetStateAction } from 'react';
-import { InputData } from '../models/InputData';
+import { InputData, TerminalHistory } from '../models/InputData';
 import { sendApiRequest } from './sendApiRequest';
 import { addTextWithAtIndex, getTextWithRemovedIndex } from './stringManipulators';
 
@@ -10,7 +10,7 @@ type ExtraProps = {
     mode: 'command' | 'javascript';
     frameRef: RefObject<HTMLIFrameElement>;
     setMode: Dispatch<SetStateAction<'command' | 'javascript'>>;
-    setTerminalHistory: Dispatch<SetStateAction<string[]>>;
+    setTerminalHistory: Dispatch<SetStateAction<TerminalHistory>>;
 };
 
 export const handleKeyDown = (
