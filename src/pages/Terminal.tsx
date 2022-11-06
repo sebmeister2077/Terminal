@@ -3,21 +3,14 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { handleKeyDown } from '../shared/helpers/handleKeyDown';
 import { getItem, removeItems, setItem } from '../shared/helpers/localstorageHandler';
-import { InputData } from '../shared/models/InputData';
-
-const initialText =
-    '' ??
-    ` a = document.createElement('a');
-a.text = "Hello";
-a.setAttribute('href','ok');
-document.body.append(a);`;
+import { InputData, staticTerminalHistory, TerminalHistory } from '../shared/models/InputData';
 
 export const Terminal = () => {
-    const [terminalHistory, setTerminalHistory] = useState<string[]>([]);
+    const [terminalHistory, setTerminalHistory] = useState<TerminalHistory>(staticTerminalHistory);
     const [currentRoute, setCurrentRoute] = useState('D:/Sebas>');
     const [{ selectedIndex, text }, setTextData] = useState<InputData>({
-        selectedIndex: initialText.length,
-        text: initialText,
+        selectedIndex: 0,
+        text: '',
     });
     const location = useLocation();
 
@@ -66,7 +59,7 @@ export const Terminal = () => {
     }, [mode]);
 
     function keyListener(e) {
-        document.title = String.raw`C:\WINDOWS\System32\cmd.exe`;
+        document.title = String.raw`Terminal JS`;
         handleKeyDown(setTextData, {
             setCurrentRoute,
             text: textRef.current,
@@ -79,7 +72,7 @@ export const Terminal = () => {
     }
 
     function clickListener() {
-        document.title = String.raw`Select C:\WINDOWS\System32\cmd.exe`;
+        document.title = String.raw`Select Terminal JS`;
     }
     function unloadListener() {
         const shouldSave = getItem('save') === 'true';
