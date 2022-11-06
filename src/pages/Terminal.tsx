@@ -1,19 +1,32 @@
 import { makeStyles } from '@mui/styles';
-import { SyntheticEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { handleKeyDown } from '../shared/helpers/handleKeyDown';
-import { addTextWithAtIndex, getTextWithRemovedIndex } from '../shared/helpers/stringManipulators';
-import { InputData } from '../shared/models/InputData';
+import { getItem, removeItems, setItem } from '../shared/helpers/localstorageHandler';
+import { InputData, staticTerminalHistory, TerminalHistory } from '../shared/models/InputData';
 
 export const Terminal = () => {
-    const { terminalRoot, command, cursor } = useStyles();
+    const [terminalHistory, setTerminalHistory] = useState<TerminalHistory>(staticTerminalHistory);
     const [currentRoute, setCurrentRoute] = useState('D:/Sebas>');
-    const [{ selectedIndex, text }, setTextData] = useState<InputData>({ selectedIndex: 0, text: '' });
-
-    const textRef = useRef(text);
-    const routeTextRef = useRef(currentRoute);
+    const [{ selectedIndex, text }, setTextData] = useState<InputData>({
+        selectedIndex: 0,
+        text: '',
+    });
+    const location = useLocation();
 
     const commandContainerRef = useRef<HTMLDivElement | null>(null);
     const cursorRef = useRef<HTMLSpanElement | null>(null);
+
+    const [mode, setMode] = useState<'command' | 'javascript'>('javascript');
+    const frameRef = useRef<HTMLIFrameElement>(null);
+    const isBasePage = !location.pathname.endsWith('/blank');
+    const showIframe = isBasePage && mode == 'javascript';
+
+    const textRef = useRef(text);
+    const routeTextRef = useRef(currentRoute);
+    const modeRef = useRef(mode);
+
+    const { terminalRoot, command, cursor, routeText, commandHistory, reminder } = useStyles({ showIframe });
 
     useEffect(() => {
         if (!cursorRef.current || !commandContainerRef.current) return;
@@ -24,10 +37,11 @@ export const Terminal = () => {
         const routeLength = currentRoute.length;
         const childIndex = routeLength + selectedIndex - 1;
 
-        const lastElement = commandContainerRef.current.children[childIndex];
-        const { offsetTop, offsetHeight, offsetLeft, offsetWidth } = lastElement as HTMLElement;
+        const lastElement = commandContainerRef.current.children[childIndex] as HTMLElement;
+        const { offsetTop, offsetHeight, offsetLeft, offsetWidth } = lastElement;
 
         cursorRef.current.style.display = 'visible';
+
         cursorRef.current.style.top = `${offsetTop + offsetHeight}px`;
         cursorRef.current.style.left = `${offsetLeft + offsetWidth}px`;
     }, [selectedIndex]);
@@ -40,34 +54,86 @@ export const Terminal = () => {
         routeTextRef.current = currentRoute;
     }, [currentRoute]);
 
-    function listener(e) {
-        handleKeyDown(setTextData, { setCurrentRoute, text: textRef.current, route: routeTextRef.current })(e);
+    useEffect(() => {
+        modeRef.current = mode;
+    }, [mode]);
+
+    function keyListener(e) {
+        document.title = String.raw`Terminal JS`;
+        handleKeyDown(setTextData, {
+            setCurrentRoute,
+            text: textRef.current,
+            route: routeTextRef.current,
+            setMode,
+            mode: modeRef.current,
+            frameRef,
+            setTerminalHistory,
+        })(e);
+    }
+
+    function clickListener() {
+        document.title = String.raw`Select Terminal JS`;
+    }
+    function unloadListener() {
+        const shouldSave = getItem('save') === 'true';
+
+        if (shouldSave) {
+            setItem({ name: 'currentRoute', value: currentRoute });
+            setItem({ name: 'history', value: terminalHistory.join('MyDelimiterOk') });
+        } else {
+            removeItems(['currentRoute', 'history']);
+        }
     }
 
     useEffect(() => {
-        //handle key here + change title
-        document.addEventListener('keydown', listener);
+        document.addEventListener('click', clickListener);
+        document.addEventListener('keydown', keyListener);
+        window.addEventListener('unload', unloadListener);
         return () => {
-            document.removeEventListener('keydown', listener);
+            document.removeEventListener('click', clickListener);
+            document.removeEventListener('keydown', keyListener);
+            window.removeEventListener('unload', unloadListener);
         };
     }, []);
 
     return (
-        <section className={terminalRoot}>
-            <div className={command} ref={commandContainerRef}>
-                {(currentRoute + text).split('').map((character, idx) => (
-                    <pre key={idx}>{character}</pre>
+        <>
+            <section className={terminalRoot}>
+                {terminalHistory.map((message) => (
+                    <pre className={commandHistory} key={`history-${message}`}>
+                        {message}
+                    </pre>
                 ))}
-                <span className={cursor} ref={cursorRef}></span>
-            </div>
-        </section>
+                <div className={command} ref={commandContainerRef}>
+                    {currentRoute.split('').map((char, idx) => (
+                        <pre className={routeText} key={`route-txt-${idx}`}>
+                            {char}
+                        </pre>
+                    ))}
+                    {text.split('').map((char, idx) => (
+                        <pre key={`text-${idx}`}>{char}</pre>
+                    ))}
+                    <span className={cursor} ref={cursorRef}></span>
+                </div>
+            </section>
+            {showIframe && (
+                <>
+                    {/* @ts-ignore */}
+                    <marquee className={reminder}>Use terminal to write JavaScript</marquee>
+                    <iframe src={window.location.origin + '/blank'} data-iframe ref={frameRef}></iframe>
+                </>
+            )}
+        </>
     );
 };
 
+type StyleProps = {
+    showIframe: boolean;
+};
 const useStyles = makeStyles({
-    terminalRoot: {
+    terminalRoot: ({ showIframe }: StyleProps) => ({
         height: '100vh',
-        width: '100vw',
+        width: showIframe ? '50%' : '100%',
         overflow: 'clip auto',
         display: 'flex',
         flexDirection: 'column',
@@ -75,7 +141,8 @@ const useStyles = makeStyles({
             display: 'flex',
             flexWrap: 'wrap',
         },
-    },
+    }),
+    commandHistory: {},
     command: {
         position: 'relative',
     },
@@ -85,5 +152,13 @@ const useStyles = makeStyles({
         width: '12px',
         height: '4px',
         transform: 'translateY(-4px)',
+    },
+    routeText: {
+        userSelect: 'none',
+    },
+    reminder: {
+        position: 'fixed',
+        top: '0px',
+        right: '0px',
     },
 });
