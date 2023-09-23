@@ -48,6 +48,8 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             const previousKey = indexToInsert ? old[indexToInsert - 1].key : null;
             const newElement: CommandKeyElement = { character: e.key, key: newKey, previousKey };
             const newCommand = [...old.slice(0, indexToInsert), newElement, ...old.slice(indexToInsert)];
+            const elementAfter = newCommand.at(indexToInsert + 1);
+            if (elementAfter) elementAfter.previousKey = newKey;
             return newCommand;
         });
     };
@@ -60,7 +62,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             return true;
         }
         if (move === 'ArrowRight') {
-            if ((cursorPositionKey === null && command.length === 0) || currentElementIndex == command.length) return true;
+            if ((cursorPositionKey === null && command.length === 0) || currentElementIndex == command.length - 1) return true;
             if (cursorPositionKey === null) {
                 setCursorPositionKey(command[0].key);
                 return true;
@@ -86,18 +88,19 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
 
     return (
         <>
-            <div className="w-full flex">
+            <div className="w-full flex min-h-[32rem]  items-start" onClick={() => spanRef.current?.focus()}>
                 <span>{route}</span>
                 <span>{'>'}</span>
-                <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex" tabIndex={-1} autoFocus>
+                <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex min-h-[24px]" tabIndex={-1} autoFocus>
                     <div
-                        className={cn('w-[1ch] h-full bg-neutral-200', {
-                            hidden: cursorPositionKey !== null,
+                        className={cn('w-[1ch]  bg-neutral-200', {
+                            hidden: cursorPositionKey !== null || command.length,
                         })}
                     ></div>
                     {command.map(({ character, key, previousKey }) => (
                         <div
                             key={key}
+                            data-key={key}
                             className={cn('w-[1ch] overflow-hidden', {
                                 'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey,
                             })}
@@ -106,7 +109,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                         </div>
                     ))}
                     <div
-                        className={cn('w-[1ch] h-full bg-neutral-200', {
+                        className={cn('w-[1ch]  bg-neutral-200', {
                             hidden: cursorPositionKey !== command.at(-1)?.key,
                         })}
                     ></div>
