@@ -1,47 +1,23 @@
-import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { BFSRequire, configure } from 'browserfs'
+import { useToggle } from 'react-use'
+import { Terminal } from './components/Terminal';
+import { configureFS } from './utils/configureFs';
+import { useEffectWithAbort } from './hooks/useEffectWithAbort';
 
 function App() {
-  const [count, setCount] = useState(0)
-  useEffect(() => {
-    configure({ fs: "LocalStorage", options: {} }, (e) => {
-      
-      const fs = BFSRequire("fs");
-
-      // fs.writeFile('/test.txt', 'Cool, I can do this in the browser!', function(err) {
-	fs.readFile('/test.txt', function(err, contents) {
-		console.log(contents?.toString());
-	// });
-});
+  const [isInitialized, toggleIsInitialized] = useToggle(false);
+  
+  useEffectWithAbort((signal) => {
+    configureFS().then(() => {
+      if (signal.aborted) return;
+      toggleIsInitialized();
     })
   }, [])
   
+
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <main className='h-screen w-screen'>
+      {isInitialized && <Terminal/>}
+    </main>
   )
 }
 
