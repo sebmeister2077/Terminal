@@ -19,18 +19,19 @@ export const Terminal = () => {
         if (isExecuting.current) return;
         try {
             isExecuting.current = true;
-            //EXECUTE COMMAND
-            // const { newRoute, outputData } = await executeCommand(command);
-
             const newItems = deepCopy(terminalItems);
             const lastItem = newItems.at(-1);
             if (!lastItem) return;
+
+            //EXECUTE COMMAND
+            const { newRoute, outputData } = await executeCommand(lastItem.route, command);
+
             lastItem.command = command;
-            const route = lastItem.route;
+            lastItem.commandResponse = outputData;
 
             newItems.push({
                 id: nanoid(),
-                route,
+                route: newRoute,
             });
             setTerminalItems(newItems);
         } finally {

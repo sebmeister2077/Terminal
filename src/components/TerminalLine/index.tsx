@@ -77,7 +77,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
     }
 
     function comppressCommandToString() {
-        return command.map((c) => c.character).join();
+        return command.map((c) => c.character).join('');
     }
 
     useEffect(() => {
@@ -126,7 +126,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             {commandResponse && (
                 <div className="w-full">
                     {commandResponse.map((text) => (
-                        <div>{text}</div>
+                        <div key={text}>{text}</div>
                     ))}
                 </div>
             )}
