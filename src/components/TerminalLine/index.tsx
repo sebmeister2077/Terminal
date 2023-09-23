@@ -41,6 +41,9 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
         const handled = handleMoveCursor(e.key);
         if (handled) return;
 
+        //probably some combination of keys
+        if (e.key.length > 1) return;
+
         const newKey = nanoid();
         setCursorPositionKey(newKey);
         setCommand((old) => {
@@ -88,13 +91,18 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
 
     return (
         <>
-            <div className="w-full flex min-h-[32rem]  items-start" onClick={() => spanRef.current?.focus()}>
+            <div
+                className={cn('w-full flex   items-start', {
+                    'min-h-[32rem]': !readonly,
+                })}
+                onClick={() => spanRef.current?.focus()}
+            >
                 <span>{route}</span>
                 <span>{'>'}</span>
                 <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex min-h-[24px]" tabIndex={-1} autoFocus>
                     <div
                         className={cn('w-[1ch]  bg-neutral-200', {
-                            hidden: cursorPositionKey !== null || command.length,
+                            hidden: cursorPositionKey !== null || command.length || readonly,
                         })}
                     ></div>
                     {command.map(({ character, key, previousKey }) => (
@@ -102,7 +110,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                             key={key}
                             data-key={key}
                             className={cn('w-[1ch] overflow-hidden', {
-                                'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey,
+                                'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey && !readonly,
                             })}
                         >
                             {character}
@@ -110,7 +118,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                     ))}
                     <div
                         className={cn('w-[1ch]  bg-neutral-200', {
-                            hidden: cursorPositionKey !== command.at(-1)?.key,
+                            hidden: cursorPositionKey !== command.at(-1)?.key || readonly,
                         })}
                     ></div>
                 </span>

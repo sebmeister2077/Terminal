@@ -38,7 +38,7 @@ export const Terminal = () => {
         }
     };
     return (
-        <section>
+        <section className="select-none">
             <div>
                 Microsoft Windows [Version 10.0.19045.3448]
                 <br />
@@ -46,7 +46,7 @@ export const Terminal = () => {
                 <div className="h-4"></div>
             </div>
             {terminalItems.map((item) => (
-                <TerminalLine {...item} onEnter={handleCommand} key={`terminal-item-${item.id}`} readonly={Boolean(item.id)} />
+                <TerminalLine {...item} onEnter={handleCommand} key={`terminal-item-${item.id}`} readonly={Boolean(item.command)} />
             ))}
         </section>
     );
