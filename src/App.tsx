@@ -1,11 +1,24 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { BFSRequire, configure } from 'browserfs'
 
 function App() {
   const [count, setCount] = useState(0)
+  useEffect(() => {
+    configure({ fs: "LocalStorage", options: {} }, (e) => {
+      
+      const fs = BFSRequire("fs");
 
+      // fs.writeFile('/test.txt', 'Cool, I can do this in the browser!', function(err) {
+	fs.readFile('/test.txt', function(err, contents) {
+		console.log(contents?.toString());
+	// });
+});
+    })
+  }, [])
+  
   return (
     <>
       <div>
