@@ -12,6 +12,7 @@ type Props = Pick<TerminalLineData, 'route' | 'commandResponse'> & {
 type CommandKeyElement = {
     key: string;
     character: string;
+    previousKey: string | null;
 };
 export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Props) => {
     const spanRef = useRef<HTMLSpanElement | null>(null);
@@ -19,11 +20,17 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
     const [cursorPositionKey, setCursorPositionKey] = useState<string | null>(null);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-        console.log(e);
+        // console.log(e);
 
         if (e.key === 'Backspace') {
-            setCommand((old) => [...old].filter((c) => c.key !== cursorPositionKey));
-            if (cursorPositionKey) setCursorPositionKey(command[command.findIndex((c) => c.key === cursorPositionKey) - 1].key);
+            if (cursorPositionKey === null) return;
+            setCommand((old) => {
+                const currentIndex = old.findIndex(({ key }) => key === cursorPositionKey);
+                const newCommand = [...old].filter((c) => c.key !== cursorPositionKey);
+                if (currentIndex < old.length - 1) newCommand[currentIndex].previousKey = newCommand[currentIndex - 1].key;
+                return newCommand;
+            });
+            if (cursorPositionKey) setCursorPositionKey(command[command.findIndex((c) => c.key === cursorPositionKey) - 1]?.key ?? null);
             return;
         }
         if (e.key === 'Enter') {
@@ -38,7 +45,8 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
         setCursorPositionKey(newKey);
         setCommand((old) => {
             const indexToInsert = old.findIndex(({ key }) => key === cursorPositionKey) + 1;
-            const newElement: CommandKeyElement = { character: e.key, key: newKey };
+            const previousKey = indexToInsert ? old[indexToInsert - 1].key : null;
+            const newElement: CommandKeyElement = { character: e.key, key: newKey, previousKey };
             const newCommand = [...old.slice(0, indexToInsert), newElement, ...old.slice(indexToInsert)];
             return newCommand;
         });
@@ -52,12 +60,12 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             return true;
         }
         if (move === 'ArrowRight') {
-            if ((cursorPositionKey === null && command.length === 0) || currentElementIndex == command.length - 1) return true;
+            if ((cursorPositionKey === null && command.length === 0) || currentElementIndex == command.length) return true;
             if (cursorPositionKey === null) {
                 setCursorPositionKey(command[0].key);
                 return true;
             }
-            setCursorPositionKey(command[currentElementIndex + 1].key);
+            setCursorPositionKey(command[currentElementIndex + 1]?.key ?? null);
             return true;
         }
         return false;
@@ -81,17 +89,27 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             <div className="w-full flex">
                 <span>{route}</span>
                 <span>{'>'}</span>
-                <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative" tabIndex={-1} autoFocus>
-                    <span
-                        className={cn('absolute left-0 w-[1ch] h-full bg-neutral-200', {
-                            'opacity-0': cursorPositionKey !== null,
+                <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex" tabIndex={-1} autoFocus>
+                    <div
+                        className={cn('w-[1ch] h-full bg-neutral-200', {
+                            hidden: cursorPositionKey !== null,
                         })}
-                    ></span>
-                    {command.map(({ character, key }) => (
-                        <span key={key} className="w-[1ch]">
+                    ></div>
+                    {command.map(({ character, key, previousKey }) => (
+                        <div
+                            key={key}
+                            className={cn('w-[1ch] overflow-hidden', {
+                                'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey,
+                            })}
+                        >
                             {character}
-                        </span>
+                        </div>
                     ))}
+                    <div
+                        className={cn('w-[1ch] h-full bg-neutral-200', {
+                            hidden: cursorPositionKey !== command.at(-1)?.key,
+                        })}
+                    ></div>
                 </span>
             </div>
             {commandResponse && (
