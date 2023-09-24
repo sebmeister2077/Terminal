@@ -13,7 +13,8 @@ export type TerminalLineData = Keyable & {
 };
 
 export const Terminal = () => {
-    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: 'C:/Seba/documents', key: nanoid() }]);
+    const savedRoute = localStorage.getItem('saved_route') ?? '/';
+    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: savedRoute, key: nanoid() }]);
     const isExecuting = useRef<boolean>(false);
 
     const handleCommand = async (command: string) => {
