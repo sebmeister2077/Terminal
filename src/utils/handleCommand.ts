@@ -5,7 +5,7 @@ type CommandReturnData = {
     messages: string[];
 };
 // const MODULE_NAMES = Object.freeze(['fs', 'buffer', 'path', 'process', 'bfs_utils']);
-const HELP_MESSAGES = ['fs - file system', 'buffer - buffer', 'path - change path', 'process - process'];
+const HELP_MESSAGES = ['fs - file system', 'buffer', 'path', 'process'];
 export async function executeCommand(currentRoute: string, command: string): Promise<CommandReturnData> {
     const args = command.split(' ').map((str) => str.trim());
     const baseCommand = args.at(0);
@@ -18,10 +18,18 @@ export async function executeCommand(currentRoute: string, command: string): Pro
     function createWithMessage(...messages: string[]) {
         return { ...returnData, messages };
     }
-    const foundModule = BFSRequire(args[0]);
-    if (!foundModule) return createWithMessage('Module is invalid');
+
+    const moduleName = args[0];
+    const foundModule = BFSRequire(moduleName);
+    if (!foundModule) return createWithMessage('Module is invalid', 'Type help for some module examples');
+
     const methodName = (args.at(1) ?? '') as keyof typeof foundModule;
-    const method = foundModule[((methodName as string) + 'Sync') as keyof typeof foundModule] ?? foundModule[methodName];
+    if (methodName === '--info') {
+        const moduleKeys = Object.keys(foundModule);
+        return createWithMessage('Valid args for this module are: ', moduleKeys.join(', '));
+    }
+
+    const method = foundModule[methodName];
 
     switch (typeof method) {
         case 'function': {
@@ -49,7 +57,7 @@ export async function executeCommand(currentRoute: string, command: string): Pro
             return createWithMessage(
                 `Bad argument: '${args.at(1)}'`,
                 `Possible values are: ${moduleKeys.slice(0, 3).join(', ')} ${moduleKeys.length ? ', etc...' : ''}`,
-                `To view full possible values write: ${args.at(0)} --info`,
+                `To view full possible values write: ${moduleName} --info`,
             );
         }
     }
