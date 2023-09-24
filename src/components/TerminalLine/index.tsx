@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { TerminalLineData } from '../Terminal';
 import { cn } from '../../utils/cn';
 import { nanoid } from 'nanoid/non-secure';
-import { deepCopy } from '../../utils/deepCopy';
 import { useEffectOnce } from 'react-use';
 
 type Props = Pick<TerminalLineData, 'route' | 'commandResponse'> & {
@@ -20,6 +19,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
     const [cursorPositionKey, setCursorPositionKey] = useState<string | null>(null);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
+        if (readonly) return;
         // console.log(e);
 
         if (e.key === 'Backspace') {
@@ -101,7 +101,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                 <span>{'>'}</span>
                 <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex min-h-[24px]" tabIndex={-1} autoFocus>
                     <div
-                        className={cn('w-[1ch]  bg-neutral-200', {
+                        className={cn('w-[1ch]  bg-neutral-200 duration-75 transition-colors', {
                             hidden: cursorPositionKey !== null || command.length || readonly,
                         })}
                     ></div>
@@ -109,7 +109,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                         <div
                             key={key}
                             data-key={key}
-                            className={cn('w-[1ch] overflow-hidden', {
+                            className={cn('w-[1ch] overflow-hidden duration-75 transition-colors', {
                                 'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey && !readonly,
                             })}
                         >
@@ -117,7 +117,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                         </div>
                     ))}
                     <div
-                        className={cn('w-[1ch]  bg-neutral-200', {
+                        className={cn('w-[1ch]  bg-neutral-200 duration-75 transition-colors', {
                             hidden: cursorPositionKey !== command.at(-1)?.key || readonly,
                         })}
                     ></div>

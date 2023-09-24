@@ -9,10 +9,11 @@ export type TerminalLineData = {
     command?: string;
     commandResponse?: string[];
     id: string;
+    readonly?: boolean;
 };
 
 export const Terminal = () => {
-    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: 'C:/', id: nanoid() }]);
+    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: 'C:/Seba/documents', id: nanoid() }]);
     const isExecuting = useRef<boolean>(false);
 
     const handleCommand = async (command: string) => {
@@ -28,6 +29,7 @@ export const Terminal = () => {
 
             lastItem.command = command;
             lastItem.commandResponse = outputData;
+            lastItem.readonly = true;
 
             newItems.push({
                 id: nanoid(),
@@ -41,13 +43,13 @@ export const Terminal = () => {
     return (
         <section className="select-none">
             <div>
-                Microsoft Windows [Version 10.0.19045.3448]
+                {navigator.platform ?? 'Terminal'} [Version 127.0.0.1]
                 <br />
-                (c) Microsoft Corporation. All rights reserved.
+                (c) Terminal Corporation. All rights reserved.
                 <div className="h-4"></div>
             </div>
             {terminalItems.map((item) => (
-                <TerminalLine {...item} onEnter={handleCommand} key={`terminal-item-${item.id}`} readonly={Boolean(item.command)} />
+                <TerminalLine {...item} onEnter={handleCommand} key={`terminal-item-${item.id}`} />
             ))}
         </section>
     );

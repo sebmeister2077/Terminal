@@ -8,7 +8,7 @@ function App() {
     });
 
     return (
-        <main className="h-screen w-screen p-8 bg-zinc-900 text-neutral-200">
+        <main className="h-screen w-screen p-8 bg-zinc-900 text-neutral-200 overflow-auto scroll-smooth">
             <Terminal />
         </main>
     );
