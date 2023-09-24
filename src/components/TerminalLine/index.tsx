@@ -3,6 +3,8 @@ import { TerminalLineData } from '../Terminal';
 import { cn } from '../../utils/cn';
 import { nanoid } from 'nanoid/non-secure';
 import { useEffectOnce } from 'react-use';
+import styles from './index.module.css';
+import { deepCopy } from '../../utils/deepCopy';
 
 type Props = Pick<TerminalLineData, 'route' | 'commandResponse'> & {
     onEnter(command: string): void;
@@ -20,7 +22,7 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
         if (readonly) return;
-        // console.log(e);
+        console.log(e);
 
         if (e.key === 'Backspace') {
             if (cursorPositionKey === null) return;
@@ -32,6 +34,14 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             });
             if (cursorPositionKey) setCursorPositionKey(command[command.findIndex((c) => c.key === cursorPositionKey) - 1]?.key ?? null);
             return;
+        }
+        if (e.key === 'Delete') {
+            if (cursorPositionKey === null && command.length === 0) return;
+            const toDeleteIndex = command.findIndex(({ previousKey }) => previousKey === cursorPositionKey);
+            if (toDeleteIndex === -1) return; //skip render
+            const newCommand = [...command].filter((c) => c.previousKey !== cursorPositionKey);
+            if (toDeleteIndex < command.length - 1) newCommand[toDeleteIndex].previousKey = cursorPositionKey;
+            setCommand(newCommand);
         }
         if (e.key === 'Enter') {
             onEnter(comppressCommandToString());
@@ -101,24 +111,23 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
                 <span>{'>'}</span>
                 <span onKeyDown={handleKeyDown} ref={spanRef} className="grow outline-0 relative flex min-h-[24px]" tabIndex={-1} autoFocus>
                     <div
-                        className={cn('w-[1ch]  bg-neutral-200 duration-75 transition-colors', {
-                            hidden: cursorPositionKey !== null || command.length || readonly,
+                        className={cn(styles.character, 'bg-neutral-200 hidden', {
+                            [styles.blink]: !(cursorPositionKey !== null || command.length || readonly),
                         })}
                     ></div>
                     {command.map(({ character, key, previousKey }) => (
                         <div
                             key={key}
-                            data-key={key}
-                            className={cn('w-[1ch] overflow-hidden duration-75 transition-colors', {
-                                'bg-neutral-200 text-neutral-800': cursorPositionKey === previousKey && !readonly,
+                            className={cn(styles.character, {
+                                [styles.blink]: cursorPositionKey === previousKey && !readonly,
                             })}
                         >
                             {character}
                         </div>
                     ))}
                     <div
-                        className={cn('w-[1ch]  bg-neutral-200 duration-75 transition-colors', {
-                            hidden: cursorPositionKey !== command.at(-1)?.key || readonly,
+                        className={cn(styles.character, 'bg-neutral-200 opacity-0', {
+                            [styles.blink]: !(cursorPositionKey !== command.at(-1)?.key || readonly),
                         })}
                     ></div>
                 </span>
