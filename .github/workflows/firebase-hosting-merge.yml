@@ -13,9 +13,6 @@ jobs:
             - uses: actions/checkout@v3
             - run: npm ci && npm run build
 
-            - name: LS
-              run: ls
-
             - uses: FirebaseExtended/action-hosting-deploy@v0
               with:
                   repoToken: '${{ secrets.GITHUB_TOKEN }}'
