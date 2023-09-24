@@ -83,6 +83,14 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly, onNavi
             setCursorPositionKey(command[currentElementIndex + 1]?.key ?? null);
             return true;
         }
+        if (move === 'ArrowUp') {
+            onNavigateCommand('up');
+            return true;
+        }
+        if (move === 'ArrowDown') {
+            onNavigateCommand('down');
+            return true;
+        }
         return false;
     }
 
