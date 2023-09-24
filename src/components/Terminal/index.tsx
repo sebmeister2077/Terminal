@@ -42,6 +42,7 @@ export const Terminal = () => {
     };
 
     const handleNavigateCommand = (type: 'up' | 'down'): string | null => {
+        console.log(type);
         return null;
     };
 

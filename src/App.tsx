@@ -1,4 +1,4 @@
-import { useEffectOnce, useToggle } from 'react-use';
+import { useEffectOnce } from 'react-use';
 import { Terminal } from './components/Terminal';
 import { configureFS } from './utils/configureFs';
 

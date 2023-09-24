@@ -4,7 +4,7 @@ type CommandReturnData = {
     newRoute: string;
     messages: string[];
 };
-const MODULE_NAMES = Object.freeze(['fs', 'buffer', 'path', 'process', 'bfs_utils']);
+// const MODULE_NAMES = Object.freeze(['fs', 'buffer', 'path', 'process', 'bfs_utils']);
 const HELP_MESSAGES = ['fs - file system', 'buffer - buffer', 'path - change path', 'process - process'];
 export async function executeCommand(currentRoute: string, command: string): Promise<CommandReturnData> {
     const args = command.split(' ').map((str) => str.trim());
