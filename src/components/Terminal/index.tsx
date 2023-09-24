@@ -3,17 +3,17 @@ import { useRef, useState } from 'react';
 import { deepCopy } from '../../utils/deepCopy';
 import { nanoid } from 'nanoid';
 import { executeCommand } from '../../utils/handleCommand';
+import { Keyable } from '../../models/Keyable';
 
-export type TerminalLineData = {
+export type TerminalLineData = Keyable & {
     route: string;
     command?: string;
-    commandResponse?: string[];
-    id: string;
+    commandResponse?: (Keyable & { message: string })[];
     readonly?: boolean;
 };
 
 export const Terminal = () => {
-    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: 'C:/Seba/documents', id: nanoid() }]);
+    const [terminalItems, setTerminalItems] = useState<TerminalLineData[]>([{ route: 'C:/Seba/documents', key: nanoid() }]);
     const isExecuting = useRef<boolean>(false);
 
     const handleCommand = async (command: string) => {
@@ -25,14 +25,14 @@ export const Terminal = () => {
             if (!lastItem) return;
 
             //EXECUTE COMMAND
-            const { newRoute, outputData } = await executeCommand(lastItem.route, command);
+            const { newRoute, messages: outputData } = await executeCommand(lastItem.route, command);
 
             lastItem.command = command;
-            lastItem.commandResponse = outputData;
+            lastItem.commandResponse = outputData.filter((msg) => !!msg).map((msg) => ({ key: nanoid(), message: msg }));
             lastItem.readonly = true;
 
             newItems.push({
-                id: nanoid(),
+                key: nanoid(),
                 route: newRoute,
             });
             setTerminalItems(newItems);
@@ -40,6 +40,11 @@ export const Terminal = () => {
             isExecuting.current = false;
         }
     };
+
+    const handleNavigateCommand = (type: 'up' | 'down'): string | null => {
+        return null;
+    };
+
     return (
         <section className="select-none">
             <div>
@@ -49,7 +54,12 @@ export const Terminal = () => {
                 <div className="h-4"></div>
             </div>
             {terminalItems.map((item) => (
-                <TerminalLine {...item} onEnter={handleCommand} key={`terminal-item-${item.id}`} />
+                <TerminalLine
+                    {...item}
+                    onEnter={handleCommand}
+                    key={`terminal-item-${item.key}`}
+                    onNavigateCommand={handleNavigateCommand}
+                />
             ))}
         </section>
     );

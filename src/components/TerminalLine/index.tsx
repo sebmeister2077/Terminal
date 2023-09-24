@@ -1,28 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { TerminalLineData } from '../Terminal';
+import { type TerminalLineData } from '../Terminal';
 import { cn } from '../../utils/cn';
 import { nanoid } from 'nanoid/non-secure';
 import { useEffectOnce } from 'react-use';
 import styles from './index.module.css';
-import { deepCopy } from '../../utils/deepCopy';
 
 type Props = Pick<TerminalLineData, 'route' | 'commandResponse'> & {
     onEnter(command: string): void;
     readonly?: boolean;
+    onNavigateCommand(type: 'up' | 'down'): string | null;
 };
 type CommandKeyElement = {
     key: string;
     character: string;
     previousKey: string | null;
 };
-export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Props) => {
+export const TerminalLine = ({ onEnter, route, commandResponse, readonly, onNavigateCommand }: Props) => {
     const spanRef = useRef<HTMLSpanElement | null>(null);
     const [command, setCommand] = useState<CommandKeyElement[]>([]);
     const [cursorPositionKey, setCursorPositionKey] = useState<string | null>(null);
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLSpanElement>) => {
         if (readonly) return;
-        console.log(e);
+        // console.log(e);
 
         if (e.key === 'Backspace') {
             if (cursorPositionKey === null) return;
@@ -134,8 +134,8 @@ export const TerminalLine = ({ onEnter, route, commandResponse, readonly }: Prop
             </div>
             {commandResponse && (
                 <div className="w-full">
-                    {commandResponse.map((text) => (
-                        <div key={text}>{text}</div>
+                    {commandResponse.map(({ key, message }) => (
+                        <div key={key}>{message}</div>
                     ))}
                 </div>
             )}
